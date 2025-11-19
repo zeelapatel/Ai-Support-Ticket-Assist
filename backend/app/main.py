@@ -14,6 +14,7 @@ from typing import List
 from app import database
 from app.database import get_db
 from app import crud, schemas
+from app.agent import analyze_tickets_with_agent
 # Load environment variables
 load_dotenv()
 
@@ -186,25 +187,42 @@ async def analyze_tickets(
         # Create analysis run
         analysis_run = crud.create_analysis_run(db, summary=None)
         
-        # Call LangGraph agent here to analyze tickets
+        # Call LangGraph agent to analyze tickets
+        try:
+            analysis_results = await analyze_tickets_with_agent(tickets, analysis_run.id)
+        except Exception as e:
+            logger.error(f"Error in agent analysis: {e}")
+            # Fallback: create empty analyses if agent fails
+            analysis_results = {
+                "analysis_results": [
+                    {
+                        "ticket_id": ticket.id,
+                        "category": None,
+                        "priority": None,
+                        "notes": f"Analysis failed: {str(e)}"
+                    }
+                    for ticket in tickets
+                ],
+                "summary": f"Analysis encountered an error: {str(e)}"
+            }
         
+        # Prepare analyses data for database
         analyses_data = []
-        for ticket in tickets:
+        for result in analysis_results["analysis_results"]:
             analyses_data.append({
                 "analysis_run_id": analysis_run.id,
-                "ticket_id": ticket.id,
-                "category": None,  # Will be set by agent
-                "priority": None,  # Will be set by agent
-                "notes": None      # Will be set by agent
+                "ticket_id": result["ticket_id"],
+                "category": result.get("category"),
+                "priority": result.get("priority"),
+                "notes": result.get("notes")
             })
         
         # Create ticket analyses
         ticket_analyses = crud.create_ticket_analyses(db, analyses_data)
         
-        # Update analysis run with summary (will be set by agent)
-        # analysis_run.summary = analysis_results["summary"]
-        # db.commit()
-        # db.refresh(analysis_run)
+        # Update analysis run with summary
+        crud.update_analysis_run_summary(db, analysis_run.id, analysis_results["summary"])
+        db.refresh(analysis_run)
         
         logger.info(f"Analysis run {analysis_run.id} created with {len(ticket_analyses)} analyses")
         

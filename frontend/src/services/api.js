@@ -53,5 +53,35 @@ export const getRoot = async () => {
   return response.data;
 };
 
+// Ticket endpoints
+export const createTickets = async (tickets) => {
+  const response = await api.post('/api/tickets', { tickets });
+  return response.data;
+};
+
+export const getTickets = async (skip = 0, limit = 100) => {
+  const response = await api.get('/api/tickets', {
+    params: { skip, limit }
+  });
+  return response.data;
+};
+
+export const getTicket = async (ticketId) => {
+  const response = await api.get(`/api/tickets/${ticketId}`);
+  return response.data;
+};
+
+// Analysis endpoints
+export const analyzeTickets = async (ticketIds = null) => {
+  const body = ticketIds ? { ticket_ids: ticketIds } : {};
+  const response = await api.post('/api/analyze', body);
+  return response.data;
+};
+
+export const getLatestAnalysis = async () => {
+  const response = await api.get('/api/analysis/latest');
+  return response.data;
+};
+
 export default api;
 

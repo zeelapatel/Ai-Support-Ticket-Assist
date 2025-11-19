@@ -1,0 +1,139 @@
+.analysis-results-container {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.analysis-results-container h2 {
+  color: #e0e0e0;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.analysis-summary {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.analysis-summary h3 {
+  color: #e0e0e0;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.analysis-summary p {
+  color: #b0b0b0;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.analysis-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  color: #888;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+}
+
+.ticket-analyses h3 {
+  color: #e0e0e0;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.analyses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.analysis-item {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 1.5rem;
+  transition: border-color 0.2s;
+}
+
+.analysis-item:hover {
+  border-color: #555;
+}
+
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.analysis-header h4 {
+  color: #e0e0e0;
+  font-size: 1.1rem;
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+.analysis-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+.category-badge {
+  opacity: 0.9;
+}
+
+.priority-badge {
+  opacity: 0.9;
+}
+
+.ticket-description {
+  color: #b0b0b0;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.analysis-notes {
+  background: #1a1a1a;
+  border-left: 3px solid #667eea;
+  padding: 1rem;
+  border-radius: 4px;
+  color: #d0d0d0;
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.analysis-notes strong {
+  color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .analysis-header {
+    flex-direction: column;
+  }
+
+  .analysis-badges {
+    width: 100%;
+  }
+}
+

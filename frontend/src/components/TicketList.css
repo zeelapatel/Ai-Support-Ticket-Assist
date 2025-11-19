@@ -1,0 +1,147 @@
+.ticket-list-container {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.ticket-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ticket-list-header h2 {
+  color: #e0e0e0;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.selection-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.select-btn {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.select-btn:hover {
+  background: #333;
+  border-color: #667eea;
+}
+
+.selected-count {
+  color: #667eea;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #888;
+}
+
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ticket-item {
+  background: #2a2a2a;
+  border: 2px solid #333;
+  border-radius: 6px;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ticket-item:hover {
+  border-color: #444;
+  background: #2f2f2f;
+}
+
+.ticket-item.selected {
+  border-color: #667eea;
+  background: #2a2a3a;
+}
+
+.ticket-checkbox {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 0.25rem;
+}
+
+.ticket-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.ticket-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ticket-title {
+  color: #e0e0e0;
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.ticket-description {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 0.75rem 0;
+}
+
+.ticket-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.ticket-id {
+  font-weight: 500;
+}
+
+.ticket-date {
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .ticket-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ticket-item {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .ticket-checkbox {
+    padding-top: 0;
+  }
+}
+

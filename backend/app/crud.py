@@ -121,6 +121,26 @@ def get_latest_analysis_run(db: Session) -> Optional[AnalysisRun]:
     return db.query(AnalysisRun).order_by(desc(AnalysisRun.created_at)).first()
 
 
+def update_analysis_run_summary(db: Session, run_id: int, summary: str) -> Optional[AnalysisRun]:
+    """
+    Update the summary of an analysis run.
+    
+    Args:
+        db: Database session
+        run_id: ID of the analysis run
+        summary: Summary text to set
+        
+    Returns:
+        Updated AnalysisRun object or None if not found
+    """
+    analysis_run = db.query(AnalysisRun).filter(AnalysisRun.id == run_id).first()
+    if analysis_run:
+        analysis_run.summary = summary
+        db.commit()
+        db.refresh(analysis_run)
+    return analysis_run
+
+
 # ==================== TICKET ANALYSIS OPERATIONS ====================
 
 def create_ticket_analyses(
