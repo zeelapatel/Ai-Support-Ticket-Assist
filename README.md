@@ -522,3 +522,168 @@ The agent uses a simple but effective graph:
 - Foreign keys with CASCADE delete
 
 ---
+
+## Tradeoffs & Design Decisions
+
+**Completed in ~2 hours** (well under the 3-hour assignment constraint). This section explains the key technical decisions made throughout the project and the reasoning behind them:
+
+### Architecture & Technology Choices
+
+1. **FastAPI + SQLAlchemy + PostgreSQL**
+   - **Decision**: Used FastAPI for async-capable Python backend with SQLAlchemy ORM
+   - **Reasoning**: FastAPI provides automatic API documentation, type safety, and excellent performance. SQLAlchemy offers a clean ORM abstraction while maintaining flexibility. PostgreSQL was chosen for its reliability and ACID compliance, essential for ticket analysis data integrity.
+
+2. **React Frontend with Component-Based Architecture**
+   - **Decision**: Built React app with separate components (TicketForm, TicketList, AnalysisResults, AnalysisSidebar)
+   - **Reasoning**: Component-based architecture promotes reusability and maintainability. Separated concerns allow for easier testing and future enhancements. The modular structure made it easy to add features like resizable panels and analysis history.
+
+3. **LangGraph for Agent Implementation**
+   - **Decision**: Used LangGraph's StateGraph for the analysis agent
+   - **Reasoning**: LangGraph provides a clear, visual way to structure agent workflows. The state-based approach makes it easy to understand the flow (analyze tickets → generate summary) and allows for future expansion with additional nodes. The separation between graph logic and database operations maintains clean architecture.
+
+### Implementation Decisions
+
+4. **Synchronous Agent Execution (`graph.invoke()` vs `graph.ainvoke()`)**
+   - **Decision**: Used synchronous `graph.invoke()` instead of async `graph.ainvoke()`
+   - **Reasoning**: While FastAPI supports async, the LangGraph agent processes tickets sequentially anyway. Using sync execution simplified error handling and debugging during the 2-hour timeframe. The performance difference is minimal for the expected ticket volumes, and async can be added later if needed.
+
+5. **Mock Analysis Fallback**
+   - **Decision**: Implemented keyword-based mock analysis when OpenAI API key is not available
+   - **Reasoning**: This allows the application to be fully functional without external dependencies, making it easier to test and demonstrate. The mock implementation uses simple keyword matching, which is transparent and easy to understand. This decision prioritizes accessibility and testing over sophisticated fallback logic.
+
+6. **Direct SQLAlchemy Table Creation**
+   - **Decision**: Used `Base.metadata.create_all()` for table creation instead of Alembic migrations
+   - **Reasoning**: For a 2-hour MVP, migration tooling adds complexity without immediate benefit. The SQL migration file (`init.sql`) exists for Docker initialization, providing the schema definition. Alembic migrations would be the next step for production, but weren't necessary for the initial implementation.
+
+7. **Analysis History with Polling vs WebSockets**
+   - **Decision**: Implemented 30-second polling for auto-refresh instead of WebSockets
+   - **Reasoning**: Polling is simpler to implement, requires no additional infrastructure, and works reliably across all environments. For the expected usage patterns, 30-second refresh is sufficient. WebSockets would add complexity (connection management, reconnection logic) without significant benefit for this use case. Can be upgraded later if real-time updates become critical.
+
+8. **Resizable Panels Implementation**
+   - **Decision**: Built custom ResizableSplitter component instead of using a library
+   - **Reasoning**: Custom implementation gives full control over behavior and styling. The component is lightweight (~80 lines) and tailored to our specific needs. Using a library would add dependencies and potential over-engineering for a simple splitter. The implementation uses native browser events for better performance.
+
+9. **Sidebar Layout for Analysis History**
+   - **Decision**: Placed analysis history in a left sidebar instead of a dropdown or modal
+   - **Reasoning**: Sidebar provides persistent visibility of analysis history, making it easy to switch between analyses. This improves UX by reducing clicks and providing context. The collapsible design (though we kept it always visible) allows for future customization. This decision prioritizes discoverability and ease of use.
+
+10. **Auto-refresh on Analysis Creation**
+    - **Decision**: Implemented immediate refresh trigger when new analysis is created, plus periodic polling
+    - **Reasoning**: Immediate refresh ensures users see new analyses right away without waiting for the next poll cycle. Combined with periodic polling, this provides both responsiveness and reliability. The dual approach handles both user-initiated actions and external changes.
+
+### Code Organization Decisions
+
+11. **Separation of Concerns (API → Agent → CRUD)**
+    - **Decision**: Strict separation between API layer, agent logic, and database operations
+    - **Reasoning**: This architecture makes the codebase maintainable and testable. Each layer has a single responsibility, making it easier to modify or replace components. For example, the agent can be tested independently of the database, and the API layer can be swapped without affecting business logic.
+
+12. **Pydantic Schemas for Request/Response Validation**
+    - **Decision**: Used Pydantic models for all API request/response validation
+    - **Reasoning**: Pydantic provides automatic validation, type checking, and documentation. This catches errors early and ensures data consistency. The schemas also serve as documentation for API consumers, reducing the need for separate API docs.
+
+13. **Error Handling Strategy**
+    - **Decision**: Basic try/except blocks with logging, no retry logic or circuit breakers
+    - **Reasoning**: For a 2-hour MVP, comprehensive error handling would consume significant time. Basic error handling with logging provides visibility into issues. Retry logic and circuit breakers are important for production but can be added incrementally. The current approach prioritizes getting core functionality working.
+
+### What Was Prioritized
+
+1. ✅ **Core Functionality First**: All required endpoints and features implemented
+2. ✅ **Code Quality**: Clean architecture and separation of concerns maintained
+3. ✅ **User Experience**: Added bonus features (history, resizable panels) that enhance usability
+4. ✅ **Docker Setup**: Ensured easy deployment and reproducibility
+5. ✅ **Documentation**: Comprehensive README to help reviewers understand the project
+
+### What Was Deferred (And Why)
+
+1. **Comprehensive Testing**: Testing would require significant time. Manual testing was sufficient for MVP validation, and automated tests can be added incrementally.
+
+2. **Production-Ready Error Handling**: Retry logic, circuit breakers, and advanced error recovery are important but not critical for demonstrating core functionality.
+
+3. **Rate Limiting & Security Hardening**: These are production concerns that can be added when moving beyond MVP stage.
+
+4. **Database Migrations (Alembic)**: The current approach works for initial deployment. Migrations become critical when schema changes are needed in production.
+
+5. **WebSockets for Real-Time Updates**: Polling is sufficient for current needs. WebSockets add complexity that wasn't justified for the MVP.
+
+**Note**: All deferred items are well-understood and can be implemented incrementally. The current architecture supports adding these features without major refactoring.
+
+---
+
+## Future Improvements
+
+If given more time, here's what would be prioritized:
+
+### High Priority
+
+1. **Testing**
+   - Unit tests for CRUD operations
+   - Integration tests for API endpoints
+   - Agent testing with mocked LLM responses
+   - Frontend component tests
+
+2. **Error Handling & Resilience**
+   - Retry logic for database connections
+   - Circuit breakers for external API calls
+   - Better error messages for users
+   - Error tracking (Sentry, etc.)
+
+3. **Security**
+   - Input validation and sanitization
+   - Rate limiting (per IP/user)
+   - API authentication/authorization
+   - SQL injection prevention (already handled by SQLAlchemy, but audit)
+
+4. **Database Migrations**
+   - Alembic for schema versioning
+   - Migration rollback support
+   - Data migration scripts
+
+### Medium Priority
+
+5. **Performance**
+   - Async agent execution (`graph.ainvoke()`)
+   - Database query optimization
+   - Caching for frequently accessed data
+   - Pagination improvements
+
+6. **Monitoring & Observability**
+   - Structured logging
+   - Metrics collection (Prometheus)
+   - Health check improvements
+   - Request tracing
+
+7. **UI/UX Enhancements**
+   - Real-time updates (WebSockets instead of polling)
+   - Better loading states
+   - Error boundaries in React
+   - Responsive design improvements
+   - Accessibility improvements
+   - Keyboard shortcuts
+
+8. **Agent Improvements**
+   - Multi-step reasoning for complex tickets
+   - Confidence scores for categorizations
+   - Batch processing optimization
+   - Support for multiple LLM providers
+
+### Low Priority
+
+9. **Features**
+   - Ticket editing/deletion
+   - Export analysis results (CSV, PDF)
+   - Ticket search and filtering
+   - User preferences
+   - Dark/light theme toggle
+
+10. **DevOps**
+    - CI/CD pipeline
+    - Automated testing in CI
+    - Staging environment
+    - Blue-green deployments
+
+11. **Documentation**
+    - API versioning
+    - OpenAPI spec enhancements
+    - Architecture decision records (ADRs)
+    - Developer onboarding guide
+
