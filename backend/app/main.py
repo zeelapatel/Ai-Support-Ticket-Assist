@@ -241,6 +241,27 @@ async def analyze_tickets(
         )
 
 
+@app.get("/api/analysis/runs", response_model=List[schemas.AnalysisRunResponse])
+async def get_all_analysis_runs(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """
+    Get all analysis runs with pagination.
+    Returns analysis runs ordered by created_at (newest first).
+    """
+    try:
+        analysis_runs = crud.get_all_analysis_runs(db, skip=skip, limit=limit)
+        return [schemas.AnalysisRunResponse.model_validate(run) for run in analysis_runs]
+    except Exception as e:
+        logger.error(f"Error fetching analysis runs: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch analysis runs: {str(e)}"
+        )
+
+
 @app.get("/api/analysis/latest", response_model=schemas.LatestAnalysisResponse)
 async def get_latest_analysis(db: Session = Depends(get_db)):
     """
@@ -281,6 +302,52 @@ async def get_latest_analysis(db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch latest analysis: {str(e)}"
+        )
+
+
+@app.get("/api/analysis/{run_id}", response_model=schemas.LatestAnalysisResponse)
+async def get_analysis_by_id(
+    run_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Get a specific analysis run by ID with all ticket analyses and their associated tickets.
+    """
+    try:
+        result = crud.get_analysis_run_with_tickets(db, run_id)
+        
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Analysis run with ID {run_id} not found"
+            )
+        
+        # Build response with ticket data included
+        ticket_analyses_response = []
+        for ta in result["ticket_analyses"]:
+            ta_dict = {
+                "id": ta.id,
+                "analysis_run_id": ta.analysis_run_id,
+                "ticket_id": ta.ticket_id,
+                "category": ta.category,
+                "priority": ta.priority,
+                "notes": ta.notes,
+                "ticket": schemas.TicketResponse.model_validate(ta.ticket) if ta.ticket else None
+            }
+            ticket_analyses_response.append(schemas.TicketAnalysisResponse(**ta_dict))
+        
+        return schemas.LatestAnalysisResponse(
+            analysis_run=schemas.AnalysisRunResponse.model_validate(result["analysis_run"]),
+            ticket_analyses=ticket_analyses_response
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching analysis run {run_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch analysis run: {str(e)}"
         )
 
 

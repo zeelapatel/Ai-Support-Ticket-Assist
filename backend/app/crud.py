@@ -200,6 +200,58 @@ def get_ticket_analyses_by_run_id(
     )
 
 
+def get_all_analysis_runs(db: Session, skip: int = 0, limit: int = 100) -> List[AnalysisRun]:
+    """
+    Get all analysis runs with pagination.
+    
+    Args:
+        db: Database session
+        skip: Number of records to skip
+        limit: Maximum number of records to return
+        
+    Returns:
+        List of AnalysisRun objects ordered by created_at (newest first)
+    """
+    return (
+        db.query(AnalysisRun)
+        .order_by(desc(AnalysisRun.created_at))
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+def get_analysis_run_with_tickets(db: Session, run_id: int) -> Optional[dict]:
+    """
+    Get a specific analysis run with all ticket analyses and their associated tickets.
+    
+    Args:
+        db: Database session
+        run_id: ID of the analysis run
+        
+    Returns:
+        Dictionary with:
+            - analysis_run: AnalysisRun object
+            - ticket_analyses: List of TicketAnalysis objects with loaded ticket relationships
+        Returns None if analysis run not found
+    """
+    analysis_run = get_analysis_run(db, run_id)
+    if not analysis_run:
+        return None
+    
+    # Get ticket analyses with eager loading of ticket relationship
+    ticket_analyses = (
+        db.query(TicketAnalysis)
+        .filter(TicketAnalysis.analysis_run_id == run_id)
+        .all()
+    )
+    
+    return {
+        "analysis_run": analysis_run,
+        "ticket_analyses": ticket_analyses
+    }
+
+
 def get_latest_analysis_with_tickets(db: Session) -> Optional[dict]:
     """
     Get the latest analysis run with all ticket analyses and their associated tickets.

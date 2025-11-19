@@ -52,12 +52,25 @@ code {
   color: #b0b0b0;
 }
 
-.App-main {
+.app-layout {
+  display: flex;
   flex: 1;
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
+  overflow: hidden;
+  height: calc(100vh - 140px);
+}
+
+.main-content {
+  height: 100%;
+  overflow-y: auto;
   padding: 2rem;
+  background: #121212;
+}
+
+.analysis-results-panel {
+  height: 100%;
+  overflow-y: auto;
+  background: #1a1a1a;
+  padding: 1.5rem;
 }
 
 .error-banner {
@@ -183,17 +196,74 @@ code {
   background: #555;
 }
 
+.no-analysis-placeholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.placeholder-content h3 {
+  color: #888;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.placeholder-content p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1200px) {
+  .app-layout {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .main-content {
+    border-bottom: 1px solid #333;
+  }
+
+  .analysis-results-panel {
+    height: 600px;
+    border-top: 1px solid #333;
+  }
+}
+
 @media (max-width: 768px) {
   .App-header h1 {
     font-size: 2rem;
   }
 
-  .App-main {
+  .main-content {
     padding: 1rem;
   }
 
   .analyze-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .analysis-sidebar {
+    width: 100%;
+    height: 300px;
+    border-right: none;
+    border-bottom: 1px solid #333;
+  }
+
+  .analysis-results-panel {
+    height: 400px;
   }
 }

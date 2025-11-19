@@ -3,7 +3,8 @@
   border: 1px solid #333;
   border-radius: 8px;
   padding: 1.5rem;
-  margin-bottom: 2rem;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .analysis-results-container h2 {

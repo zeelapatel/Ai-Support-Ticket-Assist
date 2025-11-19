@@ -83,5 +83,17 @@ export const getLatestAnalysis = async () => {
   return response.data;
 };
 
+export const getAllAnalysisRuns = async (skip = 0, limit = 100) => {
+  const response = await api.get('/api/analysis/runs', {
+    params: { skip, limit }
+  });
+  return response.data;
+};
+
+export const getAnalysisById = async (runId) => {
+  const response = await api.get(`/api/analysis/${runId}`);
+  return response.data;
+};
+
 export default api;
 
