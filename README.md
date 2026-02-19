@@ -9,8 +9,6 @@ A full-stack application that uses AI (LangGraph) to analyze and categorize supp
 - [Configuration](#configuration)
 - [API Overview](#api-overview)
 - [Architecture Notes](#architecture-notes)
-- [Tradeoffs & Shortcuts](#tradeoffs--shortcuts)
-- [Future Improvements](#future-improvements)
 
 ---
 
